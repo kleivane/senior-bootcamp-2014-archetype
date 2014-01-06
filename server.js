@@ -1,6 +1,7 @@
 
 var express = require('express');
 var request = require('request');
+//var _ = require('underscore');
 var app = express();
 
 // if on heroku use heroku port.
@@ -8,6 +9,7 @@ var port = process.env.PORT || 1339;
 var username = process.env.username;
 var password = process.env.password;
 var baseurl= process.env.baseurl;
+var empbaseurl= process.env.empbaseurl;
 var authObj = {
       'user': username,
       'pass': password
@@ -52,7 +54,27 @@ app.get('/message/:id', function(req, res) {
       if(error) {
         console.log("an error has occured. keep calm and carry on.");
       }
-      res.json(body);
+      var responseObj = body;
+      var user = body.user.name;
+
+      // Getting employee name
+      request.get({
+        url: empbaseurl + "search?q=" + user.replace(" ", "%20"),
+        json: true,
+        headers: {
+                'User-Agent': 'request'
+                    }
+        }, function(error, response, body) {
+          console.log("Callback for emp lookup");
+          if(error) {
+            console.log("an error has occured. keep calm and carry on.");
+          }
+          responseObj.user.senioritet = body.Seniority;
+          responseObj.user.avdeling = body.Department;
+          res.json(responseObj);
+
+      });
+
     });
   
 });
