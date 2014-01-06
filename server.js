@@ -88,20 +88,21 @@ function fetchUserInfo(name, callback, errorcallback){
       console.log("User: ");
       console.log(user);
 
-      // Getting employee name
-      request.get({
-        url: empbaseurl + "employee/" + user.Id },
-        function(error, response, body) {
-          console.log("Callback for emp lookup");
-          if(error) {
-            console.log("an error has occured. keep calm and carry on.");
-          }
-          if(body != null && body[0]&& body[0].Seniority && body[0].Department){
-            callback({senioritet: body[0].Seniority, avdeling: body[0].Department});  
-          }
-          else { errorcallback(); }
-          
 
-      });
+      // Getting employee name
+      if(user){
+        request.get({
+          url: empbaseurl + "employee/" + user.Id },
+          function(error, response, body) {
+            console.log("Callback for emp lookup");
+            if(error) {
+              console.log("an error has occured. keep calm and carry on.");
+            }
+            if(body != null && body[0]&& body[0].Seniority && body[0].Department){
+              callback({senioritet: body[0].Seniority, avdeling: body[0].Department});  
+            }
+            else { errorcallback(); }
+        });
+      }
 }
 app.listen(port);
