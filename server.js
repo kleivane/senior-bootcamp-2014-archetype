@@ -8,6 +8,12 @@ var port = process.env.PORT || 1339;
 var username = process.env.username;
 var password = process.env.password;
 var baseurl= process.env.baseurl;
+var authObj = {
+      'user': username,
+      'pass': password
+    };
+
+request = request.defaults({auth: authObj});
 
 app.get('/', function(req, res) {
   console.log("Just logging (root)");
@@ -17,10 +23,6 @@ app.get('/', function(req, res) {
 app.get('/messages', function(req, res) {
   console.log("Just logging (messages)");
   request.get({
-    auth: {
-      'user': username,
-      'pass': password
-    },
     url: baseurl + "api/messages",
     json: true,
     headers: {
@@ -40,10 +42,6 @@ app.get('/message/:id', function(req, res) {
   var url = baseurl + "api/messages/"+req.params.id;
   console.log("url: "+ url);
   request.get({
-    auth: {
-      'user': username,
-      'pass': password
-    },
     url: url,
     json: true,
     headers: {
@@ -51,7 +49,6 @@ app.get('/message/:id', function(req, res) {
                 }
     }, function(error, response, body) {
       console.log("Callback");
-      console.log(body);
       if(error) {
         console.log("an error has occured. keep calm and carry on.");
       }
