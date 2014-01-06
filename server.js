@@ -1,25 +1,16 @@
 
 var express = require('express');
-var request = require('request');
+var request = require('./request-config');
 var async = require('async');
 var _ = require('underscore');
 var app = express();
 
 // if on heroku use heroku port.
 var port = process.env.PORT || 1339;
-var username = process.env.username;
-var password = process.env.password;
 var baseurl= process.env.baseurl;
 var empbaseurl= process.env.empbaseurl;
 
 var lookup = [];
-
-var authObj = {
-      'user': username,
-      'pass': password
-    };
-
-request = request.defaults({auth: authObj, json: true, headers: {'User-Agent':'request'}});
 
 request.get({url: empbaseurl + "all"},
     function(error, response, body) {
@@ -32,7 +23,6 @@ request.get({url: empbaseurl + "all"},
     });
 
 app.get('/', function(req, res) {
-  console.log("Just logging (root)");
   res.json("Hello");
 });
 
