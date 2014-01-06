@@ -24,8 +24,7 @@ app.get('/', function(req, res) {
 
 app.get('/messages', function(req, res) {
   console.log("Just logging (messages)");
-  request.get({
-    url: baseurl + "api/messages"},
+  request.get({url: baseurl + "api/messages"},
     function(error, response, body) {
       console.log("Callback for ")
       if(error) {
@@ -36,11 +35,12 @@ app.get('/messages', function(req, res) {
 });
 
 app.get('/message/:id', function(req, res) {
-  console.log("Just logging (message:id" +req.params.id+")");
+  console.log("Just logging (message:id:" +req.params.id+")");
   var url = baseurl + "api/messages/"+req.params.id;
+
+
   console.log("url: "+ url);
-  request.get({
-    url: url},
+  request.get({url: url},
     function(error, response, body) {
       console.log("Callback");
       if(error) {
@@ -57,14 +57,16 @@ app.get('/message/:id', function(req, res) {
           if(error) {
             console.log("an error has occured. keep calm and carry on.");
           }
-          responseObj.user.senioritet = body.Seniority;
-          responseObj.user.avdeling = body.Department;
-          res.json(responseObj);
+          if(body != null && body.Seniority && body.Department){
+            responseObj.user.senioritet = body.Seniority;
+            responseObj.user.avdeling = body.Department;
+          }
+          res.json(responseObj);  
+          
 
       });
 
-    });
-  
+    }); 
 });
 
 
