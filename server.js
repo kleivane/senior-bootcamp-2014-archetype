@@ -1,6 +1,7 @@
 
 var express = require('express');
 var request = require('request');
+var async = require('async');
 var _ = require('underscore');
 var app = express();
 
@@ -43,7 +44,10 @@ app.get('/messages', function(req, res) {
       if(error) {
         console.log("an error has occured. keep calm and carry on.");
       }
-      res.json(body);
+      async.map(body, enrichMessage, function(err, results) {
+          console.log("Async done")
+          res.json(results);
+        });
     });
 });
 
@@ -61,14 +65,10 @@ app.get('/message/:id', function(req, res) {
       }
       var responseObj = body;
 
-      fetchUserInfo(body.user.name, 
-        function(extraInfo){
-          responseObj.user.senioritet = extraInfo.senioritet;
-          responseObj.user.avdeling = extraInfo.avdeling;
-          res.json(responseObj);  
-        }, 
-        function(){
-          res.json(responseObj);
+      async.map([body], enrichMessage, function(err, results) {
+            console.log("Async done")
+            console.log(results)
+          res.json(results[0]);
         });
 
     }); 
@@ -80,29 +80,39 @@ function stripName(fullName){
   return name + fullName.slice(fullName.lastIndexOf(" "));
 }
 
-function fetchUserInfo(name, callback, errorcallback){
+function enrichMessage(message, callback){
   var user = _.find(lookup, function(employee){
-        return employee.Name == stripName(name)
+        return employee.Name == stripName(message.user.name)
       });
 
       console.log("User: ");
       console.log(user);
 
+      if (!user) {
+        console.log("No user found for name " + message.user.name);
+        callback(null, message);
+        return;
+      }
+
+      var requestUrl = empbaseurl + "employee/" + user.Id;
+      console.log("Getting emp info via " + requestUrl);
 
       // Getting employee name
-      if(user){
-        request.get({
-          url: empbaseurl + "employee/" + user.Id },
-          function(error, response, body) {
-            console.log("Callback for emp lookup");
-            if(error) {
-              console.log("an error has occured. keep calm and carry on.");
-            }
-            if(body != null && body[0]&& body[0].Seniority && body[0].Department){
-              callback({senioritet: body[0].Seniority, avdeling: body[0].Department});  
-            }
-            else { errorcallback(); }
-        });
-      }
+      request.get(
+        { url: requestUrl },
+        function(error, response, body) {
+          console.log("callback for emp lookup done");
+          console.log(body);
+          if(error) {
+            console.log("an error has occured. keep calm and carry on.");
+          }
+          if(body != null && body[0]&& body[0].Seniority && body[0].Department){
+            message.user.senioritet = body[0].Seniority;
+            message.user.avdeling = body[0].Department;  
+          }
+          console.log("Returning enriched message")
+          console.log(message.user)
+          callback(null, message);
+    });
 }
 app.listen(port);
