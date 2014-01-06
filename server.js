@@ -1,7 +1,7 @@
 
 var express = require('express');
 var request = require('request');
-//var _ = require('underscore');
+var _ = require('underscore');
 var app = express();
 
 // if on heroku use heroku port.
@@ -10,12 +10,25 @@ var username = process.env.username;
 var password = process.env.password;
 var baseurl= process.env.baseurl;
 var empbaseurl= process.env.empbaseurl;
+
+var lookup = [];
+
 var authObj = {
       'user': username,
       'pass': password
     };
 
 request = request.defaults({auth: authObj, json: true, headers: {'User-Agent':'request'}});
+
+request.get({url: empbaseurl + "all"},
+    function(error, response, body) {
+      console.log("Initializing cache")
+      lookup = _.map(body, function(employee){
+        console.log(employee)
+        return {Id: employee.Id, Name: stripName(employee.Name)};
+      });
+      console.log(lookup);
+    });
 
 app.get('/', function(req, res) {
   console.log("Just logging (root)");
@@ -35,9 +48,9 @@ app.get('/messages', function(req, res) {
 });
 
 app.get('/message/:id', function(req, res) {
+
   console.log("Just logging (message:id:" +req.params.id+")");
   var url = baseurl + "api/messages/"+req.params.id;
-
 
   console.log("url: "+ url);
   request.get({url: url},
@@ -69,5 +82,10 @@ app.get('/message/:id', function(req, res) {
     }); 
 });
 
+
+function stripName(fullName){
+  var name = fullName.slice(0, fullName.indexOf(" "));
+  return name + fullName.slice(fullName.lastIndexOf(" "));
+}
 
 app.listen(port);
