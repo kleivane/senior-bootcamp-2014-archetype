@@ -60,19 +60,25 @@ app.get('/message/:id', function(req, res) {
         console.log("an error has occured. keep calm and carry on.");
       }
       var responseObj = body;
-      var user = body.user.name;
+
+      var user = _.find(lookup, function(employee){
+        return employee.Name == stripName(body.user.name)
+      });
+
+      console.log("User: ");
+      console.log(user);
 
       // Getting employee name
       request.get({
-        url: empbaseurl + "search?q=" + user.replace(" ", "%20")},
+        url: empbaseurl + "employee/" + user.Id },
         function(error, response, body) {
           console.log("Callback for emp lookup");
           if(error) {
             console.log("an error has occured. keep calm and carry on.");
           }
-          if(body != null && body.Seniority && body.Department){
-            responseObj.user.senioritet = body.Seniority;
-            responseObj.user.avdeling = body.Department;
+          if(body != null && body[0]&& body[0].Seniority && body[0].Department){
+            responseObj.user.senioritet = body[0].Seniority;
+            responseObj.user.avdeling = body[0].Department;
           }
           res.json(responseObj);  
           
