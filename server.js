@@ -3,19 +3,38 @@ var express = require('express');
 var request = require('request');
 var app = express();
 
+// if on heroku use heroku port.
+var port = process.env.PORT || 1339;
+var username = process.env.username;
+var password = process.env.password;
+var baseurl= process.env.baseurl;
 
-var demo_url = "https://api.github.com/users/bekkopen/repos";
 app.get('/', function(req, res) {
   console.log("Just logging (root)");
-  res.json(process.env.username);
+
+  request.get({
+    auth: {
+      'user': username,
+      'pass': password
+    },
+    url: baseurl + "api/messages",
+    json: true,
+    headers: {
+            'User-Agent': 'request'
+                }
+    }, function(error, response, body) {
+      console.log("Callback for ")
+      if(error) {
+        console.log("an error has occured. keep calm and carry on.");
+      }
+      res.json(body);
+    });
 });
 
 app.get('/messages', function(req, res) {
   console.log("Just logging (messages)");
-  res.json(process.env.username);
+  res.json("");
 });
 
 
-// if on heroku use heroku port.
-var port = process.env.PORT || 1339;
 app.listen(port);
