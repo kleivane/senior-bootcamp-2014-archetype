@@ -1,20 +1,20 @@
 {
-  "name": "senior-bootcamp-2014-archetype",
+  "name": "bekk-in-berlin",
   "version": "0.0.0",
-  "description": "senior-bootcamp-archetype-2014 ==============================",
+  "description": "Tine og Thomas er på Tech case!",
   "main": "server.js",
-  "scripts": {
+    "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node server.js"
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/bekk/senior-bootcamp-2014-archetype.git"
+    "url": "git://github.com/kleivane/senior-bootcamp-2014-archetype.git"
   },
   "author": "",
   "license": "BSD-2-Clause",
   "bugs": {
-    "url": "https://github.com/bekk/senior-bootcamp-2014-archetype/issues"
+    "url": "https://github.com/kleivane/senior-bootcamp-2014-archetype/issues"
   },
   "dependencies": {
     "express": "~3.4.7",
