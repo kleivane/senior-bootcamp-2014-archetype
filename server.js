@@ -7,20 +7,7 @@ var app = express();
 var demo_url = "https://api.github.com/users/bekkopen/repos";
 app.get('/', function(req, res) {
   console.log("Just logging (root)");
-  request.get({
-    url: demo_url,
-    json: true,
-    headers: {
-            'User-Agent': 'request'
-                }
-    }, function(error, response, body) {
-      if(error) {
-        console.log("an error has occured. keep calm and carry on.");
-      }
-      res.json(response);
-    });
-
-
+  res.json(process.env.username);
 });
 
 app.get('/messages', function(req, res) {
@@ -35,7 +22,6 @@ app.get('/messages', function(req, res) {
       if(error) {
         console.log("an error has occured. keep calm and carry on.");
       }
-      res.json(process.env.username);
     });
 
 
