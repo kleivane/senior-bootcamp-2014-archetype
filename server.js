@@ -37,10 +37,9 @@ app.get('/', function(req, res) {
 });
 
 app.get('/messages', function(req, res) {
-  console.log("Just logging (messages)");
   request.get({url: baseurl + "api/messages"},
     function(error, response, body) {
-      console.log("Callback for ")
+      console.log("Callback for messages called")
       if(error) {
         console.log("an error has occured. keep calm and carry on.");
       }
@@ -53,13 +52,11 @@ app.get('/messages', function(req, res) {
 
 app.get('/message/:id', function(req, res) {
 
-  console.log("Just logging (message:id:" +req.params.id+")");
-  var url = baseurl + "api/messages/"+req.params.id;
+  var messageUrl = baseurl + "api/messages/"+req.params.id;
 
-  console.log("url: "+ url);
-  request.get({url: url},
+  request.get({url: messageUrl},
     function(error, response, body) {
-      console.log("Callback");
+      console.log("Callback for single message called");
       if(error) {
         console.log("an error has occured. keep calm and carry on.");
       }
@@ -82,23 +79,21 @@ function stripName(fullName){
 
 function enrichMessage(message, callback){
 
-  // get likes
+  // Get likes
   request.get(
     { url: baseurl + "/api/messages/" + message.id + "/likes"},
     function(error, reponse, body) {
        console.log("callback for likes lookup done");
-       console.log(body);
        message.likes = body || [];
 
       var user = _.find(lookup, function(employee){
         return employee.Name == stripName(message.user.name)
       });
 
-      console.log("User: ");
-      console.log(user);
-
       if (!user) {
         console.log("No user found for name " + message.user.name);
+        message.user.senioritet = "Manager";
+        message.user.avdeling = "Tech";
         callback(null, message);
         return;
       }
@@ -106,12 +101,11 @@ function enrichMessage(message, callback){
       var requestUrl = empbaseurl + "employee/" + user.Id;
       console.log("Getting emp info via " + requestUrl);
 
-      // Getting employee name
+      // Get employee dept. and seniority
       request.get(
         { url: requestUrl },
         function(error, response, body) {
           console.log("callback for emp lookup done");
-          console.log(body);
           if(error) {
             console.log("an error has occured. keep calm and carry on.");
           }
@@ -120,7 +114,6 @@ function enrichMessage(message, callback){
             message.user.avdeling = body[0].Department;  
           }
           console.log("Returning enriched message")
-          console.log(message.user)
           callback(null, message);
     });
   });
