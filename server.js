@@ -11,7 +11,11 @@ var baseurl= process.env.baseurl;
 
 app.get('/', function(req, res) {
   console.log("Just logging (root)");
+  res.json("Hello");
+});
 
+app.get('/messages', function(req, res) {
+  console.log("Just logging (messages)");
   request.get({
     auth: {
       'user': username,
@@ -29,11 +33,6 @@ app.get('/', function(req, res) {
       }
       res.json(body);
     });
-});
-
-app.get('/messages', function(req, res) {
-  console.log("Just logging (messages)");
-  res.json("");
 });
 
 
