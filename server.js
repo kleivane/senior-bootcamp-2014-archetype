@@ -77,6 +77,11 @@ function stripName(fullName){
   return name + fullName.slice(fullName.lastIndexOf(" "));
 }
 
+function addUserDetailsAnyway(message) {
+    message.user.senioritet = "Manager";
+    message.user.avdeling = "Tech";
+}
+
 function enrichMessage(message, callback){
 
   // Get likes
@@ -92,8 +97,7 @@ function enrichMessage(message, callback){
 
       if (!user) {
         console.log("No user found for name " + message.user.name);
-        message.user.senioritet = "Manager";
-        message.user.avdeling = "Tech";
+        addUserDetailsAnyway(message);
         callback(null, message);
         return;
       }
@@ -109,13 +113,18 @@ function enrichMessage(message, callback){
           if(error) {
             console.log("an error has occured. keep calm and carry on.");
           }
-          if(body != null && body[0]&& body[0].Seniority && body[0].Department){
+          if (body != null && body[0] && body[0].Seniority && body[0].Department){
             message.user.senioritet = body[0].Seniority;
             message.user.avdeling = body[0].Department;  
+          }
+          else {
+            addUserDetailsAnyway(message);
           }
           console.log("Returning enriched message")
           callback(null, message);
     });
   });
 }
+
 app.listen(port);
+
