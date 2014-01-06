@@ -61,8 +61,28 @@ app.get('/message/:id', function(req, res) {
       }
       var responseObj = body;
 
-      var user = _.find(lookup, function(employee){
-        return employee.Name == stripName(body.user.name)
+      fetchUserInfo(body.user.name, 
+        function(extraInfo){
+          responseObj.user.senioritet = extraInfo.senioritet;
+          responseObj.user.avdeling = extraInfo.avdeling;
+          res.json(responseObj);  
+        }, 
+        function(){
+          res.json(responseObj);
+        });
+
+    }); 
+});
+
+
+function stripName(fullName){
+  var name = fullName.slice(0, fullName.indexOf(" "));
+  return name + fullName.slice(fullName.lastIndexOf(" "));
+}
+
+function fetchUserInfo(name, callback, errorcallback){
+  var user = _.find(lookup, function(employee){
+        return employee.Name == stripName(name)
       });
 
       console.log("User: ");
@@ -77,21 +97,11 @@ app.get('/message/:id', function(req, res) {
             console.log("an error has occured. keep calm and carry on.");
           }
           if(body != null && body[0]&& body[0].Seniority && body[0].Department){
-            responseObj.user.senioritet = body[0].Seniority;
-            responseObj.user.avdeling = body[0].Department;
+            callback({senioritet: body[0].Seniority, avdeling: body[0].Department});  
           }
-          res.json(responseObj);  
+          else { errorcallback(); }
           
 
       });
-
-    }); 
-});
-
-
-function stripName(fullName){
-  var name = fullName.slice(0, fullName.indexOf(" "));
-  return name + fullName.slice(fullName.lastIndexOf(" "));
 }
-
 app.listen(port);
