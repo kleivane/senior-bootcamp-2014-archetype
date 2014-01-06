@@ -81,7 +81,16 @@ function stripName(fullName){
 }
 
 function enrichMessage(message, callback){
-  var user = _.find(lookup, function(employee){
+
+  // get likes
+  request.get(
+    { url: baseurl + "/api/messages/" + message.id + "/likes"},
+    function(error, reponse, body) {
+       console.log("callback for likes lookup done");
+       console.log(body);
+       message.likes = body || [];
+
+      var user = _.find(lookup, function(employee){
         return employee.Name == stripName(message.user.name)
       });
 
@@ -114,5 +123,6 @@ function enrichMessage(message, callback){
           console.log(message.user)
           callback(null, message);
     });
+  });
 }
 app.listen(port);
