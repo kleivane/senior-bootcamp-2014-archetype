@@ -1,7 +1,7 @@
 {
   "name": "bekk-in-berlin",
   "version": "0.0.0",
-  "description": "Tine og Thomas er på Tech case!",
+  "description": "Tine og Thomas er på tech case",
   "main": "server.js",
     "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
