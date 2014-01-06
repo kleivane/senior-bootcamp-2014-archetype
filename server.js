@@ -35,5 +35,30 @@ app.get('/messages', function(req, res) {
     });
 });
 
+app.get('/message/:id', function(req, res) {
+  console.log("Just logging (message:id" +req.params.id+")");
+  var url = baseurl + "api/messages/"+req.params.id;
+  console.log("url: "+ url);
+  request.get({
+    auth: {
+      'user': username,
+      'pass': password
+    },
+    url: url,
+    json: true,
+    headers: {
+            'User-Agent': 'request'
+                }
+    }, function(error, response, body) {
+      console.log("Callback");
+      console.log(body);
+      if(error) {
+        console.log("an error has occured. keep calm and carry on.");
+      }
+      res.json(body);
+    });
+  
+});
+
 
 app.listen(port);
