@@ -15,7 +15,7 @@ var authObj = {
       'pass': password
     };
 
-request = request.defaults({auth: authObj});
+request = request.defaults({auth: authObj, json: true, headers: {'User-Agent':'request'}});
 
 app.get('/', function(req, res) {
   console.log("Just logging (root)");
@@ -25,12 +25,8 @@ app.get('/', function(req, res) {
 app.get('/messages', function(req, res) {
   console.log("Just logging (messages)");
   request.get({
-    url: baseurl + "api/messages",
-    json: true,
-    headers: {
-            'User-Agent': 'request'
-                }
-    }, function(error, response, body) {
+    url: baseurl + "api/messages"},
+    function(error, response, body) {
       console.log("Callback for ")
       if(error) {
         console.log("an error has occured. keep calm and carry on.");
@@ -44,12 +40,8 @@ app.get('/message/:id', function(req, res) {
   var url = baseurl + "api/messages/"+req.params.id;
   console.log("url: "+ url);
   request.get({
-    url: url,
-    json: true,
-    headers: {
-            'User-Agent': 'request'
-                }
-    }, function(error, response, body) {
+    url: url},
+    function(error, response, body) {
       console.log("Callback");
       if(error) {
         console.log("an error has occured. keep calm and carry on.");
@@ -59,12 +51,8 @@ app.get('/message/:id', function(req, res) {
 
       // Getting employee name
       request.get({
-        url: empbaseurl + "search?q=" + user.replace(" ", "%20"),
-        json: true,
-        headers: {
-                'User-Agent': 'request'
-                    }
-        }, function(error, response, body) {
+        url: empbaseurl + "search?q=" + user.replace(" ", "%20")},
+        function(error, response, body) {
           console.log("Callback for emp lookup");
           if(error) {
             console.log("an error has occured. keep calm and carry on.");
