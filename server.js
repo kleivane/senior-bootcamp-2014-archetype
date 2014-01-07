@@ -1,11 +1,14 @@
 
 var express = require('express');
 var request = require('./request-config');
+
 var async = require('async');
 var _ = require('underscore');
 var app = express();
+app.use(express.bodyParser())
 
 var employeeService = require('./service/employee');
+var messageService = require('./service/message');
 
 // if on heroku use heroku port.
 var port = process.env.PORT || 1339;
@@ -32,9 +35,24 @@ app.get('/messages', function(req, res) {
     });
 });
 
-app.get('/message/:id', function(req, res) {
+app.post('/push', function(req, res){
+  console.log("Her skal vi ta imot en post");
+  console.log(req.body);
+  res.send(200);
+  //messageService.save(req.body);
+})
 
-  var messageUrl = baseurl + "api/messages/"+req.params.id;
+app.get('/message/:id', function(req, res) {
+  var id = req.params.id;
+
+  var msg = messageService.fetch(id);
+
+  if(msg){
+    res.json(msg);
+    return;
+  }
+
+  var messageUrl = baseurl + "api/messages/"+ id;
 
   request.get({url: messageUrl},
     function(error, response, body) {
