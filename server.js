@@ -5,22 +5,14 @@ var async = require('async');
 var _ = require('underscore');
 var app = express();
 
+var employeeService = require('./service/employee');
+
 // if on heroku use heroku port.
 var port = process.env.PORT || 1339;
 var baseurl= process.env.baseurl;
 var empbaseurl= process.env.empbaseurl;
 
-var lookup = [];
-
-request.get({url: empbaseurl + "all"},
-    function(error, response, body) {
-      console.log("Initializing cache")
-      lookup = _.map(body, function(employee){
-        console.log(employee)
-        return {Id: employee.Id, Name: stripName(employee.Name)};
-      });
-      console.log(lookup);
-    });
+employeeService.initialize();
 
 app.get('/', function(req, res) {
   res.json("Hello");
@@ -73,7 +65,7 @@ function addUserDetailsAnyway(message) {
 }
 
 function enrichMessage(message, callback){
-    var user = _.find(lookup, function(employee){
+    var user = _.find(employeeService.cache(), function(employee){
         return employee.Name == stripName(message.user.name)
       });
 
