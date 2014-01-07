@@ -13,7 +13,6 @@ var messageService = require('./service/message');
 // if on heroku use heroku port.
 var port = process.env.PORT || 1339;
 var baseurl= process.env.baseurl;
-var empbaseurl= process.env.empbaseurl;
 
 employeeService.initialize();
 
@@ -28,7 +27,7 @@ app.get('/messages', function(req, res) {
       if(error) {
         console.log("an error has occured. keep calm and carry on.");
       }
-      async.map(body, enrichMessage, function(err, results) {
+      async.map(body, addEmployeeInfo, function(err, results) {
           console.log("Multiple("+results.length+") messages enriched.")
           res.json(results);
         });
@@ -74,49 +73,12 @@ app.get('/message/:id', function(req, res) {
 
 });
 
-
-function stripName(fullName){
-  var name = fullName.slice(0, fullName.indexOf(" "));
-  return name + fullName.slice(fullName.lastIndexOf(" "));
-}
-
-function addUserDetailsAnyway(message) {
-    message.user.senioritet = "Manager";
-    message.user.avdeling = "Technology";
-}
-
-function enrichMessage(message, callback){
-    var user = _.find(employeeService.cache(), function(employee){
-        return employee.Name == stripName(message.user.name)
-      });
-
-      if (!user) {
-        console.log("No user found for name " + message.user.name);
-        addUserDetailsAnyway(message);
-        callback(null, message);
-        return;
-      }
-
-      var requestUrl = empbaseurl + "employee/" + user.Id;
-      console.log("Getting emp info via " + requestUrl);
-
-      // Get employee dept. and seniority
-      request.get(
-        { url: requestUrl },
-        function(error, response, body) {
-          if(error) {
-            console.log("an error has occured. keep calm and carry on.");
-          }
-          if (body != null && body[0] && body[0].Seniority && body[0].Department){
-            message.user.senioritet = body[0].Seniority;
-            message.user.avdeling = body[0].Department;  
-          }
-          else {
-            addUserDetailsAnyway(message);
-          }
-          callback(null, message);
+function addEmployeeInfo(message, callback){
+    employeeService.fetchUserInfo(message.user.name, function(userinfo){
+      message.user = _.extend(message.user, userinfo);
+      callback(null, message);    
     });
-      
+    
 }
  function enrichMessageWithLikes(message, callback){
     // Get likes
@@ -126,10 +88,11 @@ function enrichMessage(message, callback){
        console.log("callback for likes lookup done");
        message.likes = body || [];
 
-       enrichMessage(message, callback)
+       addEmployeeInfo(message, callback)
      });
 
 
  }
+
 app.listen(port);
 

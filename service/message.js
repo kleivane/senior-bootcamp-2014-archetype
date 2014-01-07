@@ -12,13 +12,11 @@ var save = function(message){
 var fetch = function(id, callback){
   console.log("Looking for message(id:"+id+") in store");
   console.log(store)
-//  return _.find(store, function(msg){
-//          return id == msg.id;
-//  })
-
   collection.query(parseInt(id), function(result){
     callback(result);
   });
 };
+
+
 
 module.exports = {save: save, fetch: fetch}
