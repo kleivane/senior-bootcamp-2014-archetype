@@ -1,4 +1,4 @@
-var request = require('../request-config');
+var request = require('../util/request-config');
 var _ = require('underscore');
 
 var empbaseurl= process.env.empbaseurl;

@@ -1,6 +1,6 @@
 
 var express = require('express');
-var request = require('./request-config');
+var request = require('./util/request-config');
 
 var async = require('async');
 var _ = require('underscore');
