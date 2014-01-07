@@ -29,7 +29,7 @@ app.get('/messages', function(req, res) {
         console.log("an error has occured. keep calm and carry on.");
       }
       async.map(body, enrichMessage, function(err, results) {
-          console.log("Async done")
+          console.log("Multiple("+results.length+") messages enriched.")
           res.json(results);
         });
     });
@@ -38,8 +38,10 @@ app.get('/messages', function(req, res) {
 app.post('/push', function(req, res){
   console.log("Her skal vi ta imot en post");
   console.log(req.body);
+  messageService.save(JSON.parse(req.body.data));
+
   res.send(200);
-  //messageService.save(req.body);
+  
 })
 
 app.get('/message/:id', function(req, res) {
@@ -48,6 +50,7 @@ app.get('/message/:id', function(req, res) {
   var msg = messageService.fetch(id);
 
   if(msg){
+    console.log("Found message(id:"+id+") in store. Returning.")
     res.json(msg);
     return;
   }
@@ -63,8 +66,7 @@ app.get('/message/:id', function(req, res) {
       var responseObj = body;
 
       async.map([body], enrichMessageWithLikes, function(err, results) {
-            console.log("Async done")
-            console.log(results)
+          console.log("Single message enriched.")
           res.json(results[0]);
         });
 

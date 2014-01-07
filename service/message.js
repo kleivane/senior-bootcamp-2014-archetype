@@ -3,14 +3,15 @@ var _ = require('underscore');
 var store = [];
 
 var save = function(message){
-	console.log("save");
+	console.log("Saving message with id "+message.id);
 	store.push(message);
 };
 
 var fetch = function(id){
-	console.log("fetch");
+	console.log("Looking for message(id:"+id+") in store");
+	console.log(store)
 	return _.find(store, function(msg){
-		return id = msg.id;
+		return id == msg.id;
 	})
 };
 
