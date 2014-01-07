@@ -52,7 +52,7 @@ app.get('/message/:id', function(req, res) {
       }
       var responseObj = body;
 
-      async.map([body], enrichMessage, function(err, results) {
+      async.map([body], enrichMessageWithLikes, function(err, results) {
             console.log("Async done")
             console.log(results)
           res.json(results[0]);
@@ -69,19 +69,11 @@ function stripName(fullName){
 
 function addUserDetailsAnyway(message) {
     message.user.senioritet = "Manager";
-    message.user.avdeling = "Tech";
+    message.user.avdeling = "Technology";
 }
 
 function enrichMessage(message, callback){
-
-  // Get likes
-  request.get(
-    { url: baseurl + "/api/messages/" + message.id + "/likes"},
-    function(error, reponse, body) {
-       console.log("callback for likes lookup done");
-       message.likes = body || [];
-
-      var user = _.find(lookup, function(employee){
+    var user = _.find(lookup, function(employee){
         return employee.Name == stripName(message.user.name)
       });
 
@@ -99,7 +91,6 @@ function enrichMessage(message, callback){
       request.get(
         { url: requestUrl },
         function(error, response, body) {
-          console.log("callback for emp lookup done");
           if(error) {
             console.log("an error has occured. keep calm and carry on.");
           }
@@ -110,11 +101,22 @@ function enrichMessage(message, callback){
           else {
             addUserDetailsAnyway(message);
           }
-          console.log("Returning enriched message")
           callback(null, message);
     });
-  });
+      
 }
+ function enrichMessageWithLikes(message, callback){
+    // Get likes
+  request.get(
+    { url: baseurl + "/api/messages/" + message.id + "/likes"},
+    function(error, reponse, body) {
+       console.log("callback for likes lookup done");
+       message.likes = body || [];
 
+       enrichMessage(message, callback)
+     });
+
+
+ }
 app.listen(port);
 
