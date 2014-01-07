@@ -47,30 +47,31 @@ app.post('/push', function(req, res){
 app.get('/message/:id', function(req, res) {
   var id = req.params.id;
 
-  var msg = messageService.fetch(id);
+  messageService.fetch(id, function(result){
+    if (result) {
+      console.log("Found message (id:"+id+") in store. Returning.")
+      res.json(result);
+      return;
+    }
 
-  if(msg){
-    console.log("Found message(id:"+id+") in store. Returning.")
-    res.json(msg);
-    return;
-  }
+    var messageUrl = baseurl + "api/messages/"+ id;
 
-  var messageUrl = baseurl + "api/messages/"+ id;
+    request.get({url: messageUrl},
+      function(error, response, body) {
+        console.log("Callback for single message called");
+        if(error) {
+          console.log("an error has occured. keep calm and carry on.");
+        }
+        var responseObj = body;
 
-  request.get({url: messageUrl},
-    function(error, response, body) {
-      console.log("Callback for single message called");
-      if(error) {
-        console.log("an error has occured. keep calm and carry on.");
-      }
-      var responseObj = body;
+        async.map([body], enrichMessageWithLikes, function(err, results) {
+            console.log("Single message enriched.")
+            res.json(results[0]);
+          });
 
-      async.map([body], enrichMessageWithLikes, function(err, results) {
-          console.log("Single message enriched.")
-          res.json(results[0]);
-        });
+      }); 
+  });
 
-    }); 
 });
 
 
