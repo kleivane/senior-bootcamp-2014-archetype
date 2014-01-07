@@ -2,8 +2,9 @@ var mongodb = require('mongodb');
 
 var mongoClient = mongodb.MongoClient
 var collection;
+var constring = process.env.MONGOLAB_URI || 'mongodb://127.0.0.1:27017/test';
 
-mongoClient.connect('mongodb://127.0.0.1:27017/test', function(err, db) {
+mongoClient.connect(constring, function(err, db) {
   if(err) throw err;
   collection = db.collection('socialcast');
 });
